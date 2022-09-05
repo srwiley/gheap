@@ -187,38 +187,41 @@ func TestMinHeap(t *testing.T) {
 	}
 }
 
-// func TestMHeap(t *testing.T) {
-// 	testSet := []HeapElement[float32, string]{
-// 		{0.0, "spruce"},
-// 		{0.2, "cypress"},
-// 		{0.6, "cedar"},
-// 		{3.0, "oak"},
-// 		{0.14, "maple"},
-// 		{1.0, "walnut"}}
+func TestHelpersHeap(t *testing.T) {
 
-// 	minheap := MHeap[float32, string, comparator[float32]]{}
-// 	for _, v := range testSet {
-// 		minheap.Insert(v)
-// 	}
-// 	for len(minheap) > 0 {
-// 		ele := minheap.RemoveMin()
-// 		fmt.Println(ele)
-// 	}
-// 	fmt.Println("reversing keys")
-// 	for _, v := range testSet {
-// 		v.Key = -v.Key
-// 		minheap.Insert(v)
-// 	}
-// 	lastKey := minheap.PeekMin().Key
-// 	for len(minheap) > 0 {
-// 		peek := minheap.PeekMin()
-// 		ele := minheap.RemoveMin()
-// 		if peek != ele {
-// 			t.Error("PeekMax and RemoveMax do not match ", peek, ele)
-// 		}
-// 		if lastKey > ele.Key {
-// 			t.Error("lastKey < curent during maxHeap remove ", peek, ele)
-// 		}
-// 		fmt.Println(ele)
-// 	}
-// }
+	testSet := []HeapElement[float32, string]{
+		{0, "spruce"},
+		{2, "cypress"},
+		{6, "cedar"},
+		{30, "oak"},
+		{1, "maple"},
+		{10, "walnut"}}
+
+	testSetRev := []HeapElement[float32, string]{
+		{10, "walnut"},
+		{1, "maple"},
+		{30, "oak"},
+		{6, "cedar"},
+		{2, "cypress"},
+		{0, "spruce"}}
+
+	baseElement := HeapElement[float32, string]{float32(0), "empty"}
+
+	Reverse(testSet)
+	if !Equals(testSet, testSetRev) {
+		t.Error("reverse slice failed ", testSet, " vs ", testSetRev)
+	}
+	Reverse(testSet)
+	if Equals(testSet, testSetRev) {
+		t.Error("double reverse slice failed ", testSet, " vs ", testSetRev)
+	}
+
+	Fill(testSet, baseElement)
+	for _, e := range testSet {
+		if e != baseElement {
+			t.Error("Set to failed ", e, " vs ", baseElement)
+		}
+	}
+
+}
+
