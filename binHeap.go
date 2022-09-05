@@ -396,3 +396,35 @@ func (b MinMaxHeap[S, T]) GetIterator(ascending bool) func() (e HeapElement[S, T
 		return
 	}
 }
+
+// *****************************************
+// Below are functions that some slice helper functions
+// *****************************************
+
+// Fill sets all indicies of a to b
+func Fill[T any](a []T, b T) {
+	for i := range a {
+		a[i] = b
+	}
+}
+
+// Equals returns true if the elements of a and b are the same
+func Equals[T comparable](a, b []T) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// Reverse reverse of order of s
+func Reverse[T any](s []T) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+}
+
