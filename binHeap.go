@@ -398,7 +398,7 @@ func (b MinMaxHeap[S, T]) GetIterator(ascending bool) func() (e HeapElement[S, T
 }
 
 // *****************************************
-// Below are functions that some slice helper functions
+// Below are some slice helper functions
 // *****************************************
 
 // Fill sets all indicies of a to b
