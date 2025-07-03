@@ -222,34 +222,37 @@ func (h MinMaxHeap[S, T]) pushDown(i int, compare func(a, b S) bool) {
 		for _, v := range [5]int{r, leftChild(l), rightChild(l), leftChild(r), rightChild(r)} {
 			if v >= len(h) {
 				break // No kids beyond this point
+				//continue
 			}
 			if compare(h[v].Key, h[minIndex].Key) {
 				minIndex = v
 			}
 		}
 		// Now that minIndex is identified, compare to i.
-		if compare(h[minIndex].Key, h[i].Key) {
-			h[minIndex], h[i] = h[i], h[minIndex]
-			if minIndex > r { // minIndex is a grand child of i
-				p := parent(minIndex)
-				if compare(h[p].Key, h[minIndex].Key) {
-					h[minIndex].Key, h[p].Key = h[p].Key, h[minIndex].Key
-				}
-			}
+		if !compare(h[minIndex].Key, h[i].Key) {
+			break
+		}
+		h[minIndex], h[i] = h[i], h[minIndex]
+		if minIndex <= r { // minIndex is a child of i
+			break
+		}
+		p := parent(minIndex)
+		if compare(h[p].Key, h[minIndex].Key) {
+			h[minIndex], h[p] = h[p], h[minIndex]
 		}
 		i = minIndex
 	}
 }
 
 // Insert adds element to the heap and maintains the
-// minmax heap order
+// minmax heap order.
 func (b *MinMaxHeap[S, T]) Insert(element HeapElement[S, T]) {
 	*b = append(*b, element)
 	b.pushUp(len(*b) - 1)
 }
 
 // RemoveMin returns the element with the lowest key
-// and removes it from the heap
+// and removes it from the heap.
 func (b *MinMaxHeap[S, T]) RemoveMin() (result HeapElement[S, T]) {
 	result = (*b)[0]
 	(*b)[0] = (*b)[len(*b)-1]  // Replace the value at the root with the last leaf
@@ -259,7 +262,7 @@ func (b *MinMaxHeap[S, T]) RemoveMin() (result HeapElement[S, T]) {
 }
 
 // RemoveMax returns the element with the highest key
-// and removes it from the heap
+// and removes it from the heap.
 func (b *MinMaxHeap[S, T]) RemoveMax() (result HeapElement[S, T]) {
 	switch len(*b) {
 	case 0:
@@ -331,7 +334,7 @@ func (b MinMaxHeap[S, T]) Copy() (c MinMaxHeap[S, T]) {
 // Depending on the organization of b, the maximum size of the iterator slice map
 // be around 1/2 of the length of b, but is usually around 1/3 or less.
 func (b MinMaxHeap[S, T]) GetIterator(ascending bool) func() (e HeapElement[S, T], r int) {
-	maxHeap := MinMaxHeap[S, int]{}
+	maxHeap := MaxHeap[S, int]{}
 	var addToIterator func(i int)
 	if ascending {
 		addToIterator = func(i int) {
@@ -342,13 +345,13 @@ func (b MinMaxHeap[S, T]) GetIterator(ascending bool) func() (e HeapElement[S, T
 			maxHeap.Insert(HeapElement[S, int]{b[i].Key, i})
 		}
 	}
-	// Set the bounds for the initial nodes
-	start, end := 1, 3 // Seed the two greatest max nodes
-	if ascending {
-		start, end = 0, 1 // Seed the root min node
-	}
-	for i := start; i < len(b) && i < end; i++ {
-		addToIterator(i)
+	// Add the initial nodes
+	if ascending || len(b) == 1 {
+		addToIterator(0)
+	} else {
+		for i := 1; i < len(b) && i < 3; i++ {
+			addToIterator(i)
+		}
 	}
 	remaining := len(b)
 	return func() (e HeapElement[S, T], rem int) {
@@ -370,7 +373,7 @@ func (b MinMaxHeap[S, T]) GetIterator(ascending bool) func() (e HeapElement[S, T
 		}
 		l := leftChild(top)
 		if l >= len(b) { // top has no children nodes, go back up
-			if top > 2 {
+			if top > 0 {
 				p := parent(top)
 				if leftChild(p) == top {
 					addToIterator(p)
@@ -427,4 +430,3 @@ func Reverse[T any](s []T) {
 		s[i], s[j] = s[j], s[i]
 	}
 }
-
